@@ -11,31 +11,16 @@ def find(point, find_list):
     return None
 
 
+
+first_line = input().split()
 word_list = []
-i = 0
-while i < 7:
+for i in range(0,int(first_line[1])):
     try:
         word = input()
         arr = word.split()
         word_list.append(arr)
     except EOFError:
         break
-    i += 1
-
-# i = 0
-# while True:
-#     try:
-#         word = input()
-#         arr = word.split()
-#         word_list.append(arr)
-#     except EOFError:
-#         break
-#     if i > (10 ** 5 - 1):
-#         break
-
-first_line = word_list[0]
-word_list.remove(word_list[0])
-
 
 def create_node(point, init_list):
     node = Node()

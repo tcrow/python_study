@@ -1,20 +1,34 @@
+# import sys
+#
+# sys.setrecursionlimit(200000)
+
+import time;
+time_start=time.time();
+
 class Node:
     def __init__(self):
         self.data = {}
         self.next = None
 
 
+# 二分查找法实现查找，需要先将数据进行排序
 def find(point, find_list):
-    for data in find_list:
-        if data[0] == point:
-            return data
+    low = 0
+    high = len(find_list) - 1
+    while low <= high:
+        mid = (low + high) // 2
+        if int(point) < int(find_list[mid][0]):
+            high = mid
+        elif int(point) > int(find_list[mid][0]):
+            low = mid + 1
+        else:
+            return find_list[mid]
     return None
-
 
 
 first_line = input().split()
 word_list = []
-for i in range(0,int(first_line[1])):
+for i in range(0, int(first_line[1])):
     try:
         word = input()
         arr = word.split()
@@ -22,61 +36,49 @@ for i in range(0,int(first_line[1])):
     except EOFError:
         break
 
-def create_node(point, init_list):
-    node = Node()
-    node.data = find(point, init_list)
-    if node.data[2] != '-1':
-        node.next = create_node(node.data[2], init_list)
-    return node
+word_list.sort(key=lambda s: int(s[0]))
 
+time_end=time.time();#time.time()为1970.1.1到当前时间的毫秒数
+print(time_end-time_start,'s')
 
-def reverse(node, k):
-    k = int(k)
+head = find(first_line[0], word_list)
+k = int(first_line[2])
+node = head
+stack_list = []
+result_list = []
+p_node = None
+h_node = None
+while node:
     if k == 1:
-        return node
-    if not node.next:
-        return node
-    temp_list = []
-    i = 0
-    next_node = None
-    while True:
-        if i < k and i < int(first_line[1]):
-            temp_list.append(node)
-            node = node.next
-        else:
-            next_node = node
-            break
-        i += 1
-    head_node = None
-    while len(temp_list) > 0:
-        node = temp_list.pop()
-        if head_node:
-            if len(temp_list) > 0:
-                node.data[2] = temp_list[len(temp_list) - 1].data[0]
-                node.next = temp_list[len(temp_list) - 1]
-            else:
-                if next_node:
-                    node.data[2] = next_node.data[0]
-                    node.next = next_node
-                else:
-                    node.data[2] = '-1'
-                    node.next = None
-        else:
-            head_node = node
-            head_node.data[2] = temp_list[len(temp_list) - 1].data[0]
-            head_node.next = temp_list[len(temp_list) - 1]
-    return head_node
-
-
-head = create_node(first_line[0], word_list)
-
-head = reverse(head, first_line[2])
-
-loop_node = head
-
-while True:
-    print(' '.join(loop_node.data))
-    if loop_node.next:
-        loop_node = loop_node.next
-    else:
+        h_node = head
         break
+    stack_list.append(node)
+    if node[2] != '-1':
+        node = find(node[2], word_list)
+    else:
+        node = None
+    if len(stack_list) == k:
+        if p_node and p_node[2] == '-1':
+            p_node[2] = stack_list[len(stack_list) - 1][0]
+        while len(stack_list) > 0:
+            if not h_node:
+                h_node = stack_list.pop()
+                h_node[2] = stack_list[len(stack_list) - 1][0]
+            else:
+                p_node = stack_list.pop()
+                if len(stack_list) > 0:
+                    p_node[2] = stack_list[len(stack_list) - 1][0]
+                else:
+                    p_node[2] = '-1'
+if len(stack_list) > 0:
+    p_node[2] = stack_list[0][0]
+
+time_end=time.time();#time.time()为1970.1.1到当前时间的毫秒数
+print(time_end-time_start,'s')
+# loop_node = h_node
+# while True:
+#     print(' '.join(loop_node))
+#     if loop_node[2] != '-1':
+#         loop_node = find(loop_node[2], word_list)
+#     else:
+#         break

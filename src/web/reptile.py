@@ -1,11 +1,27 @@
-#coding:utf-8
+# coding:utf-8
 from urllib import request
 from bs4 import BeautifulSoup
+
+
+def mkdir(path):
+    import os
+    path = path.strip()
+    path = path.rstrip("\\")
+    isExists = os.path.exists(path)
+
+    if not isExists:
+        os.makedirs(path)
+        print(path + ' 创建成功')
+        return True
+    else:
+        print(path + ' 目录已存在')
+        return False
+
 
 page = request.urlopen('https://tech.meituan.com/archives')
 
 htmlcode = page.read().decode("utf-8")
-soup = BeautifulSoup(htmlcode,'lxml')
+soup = BeautifulSoup(htmlcode, 'lxml')
 articles = soup.findAll('article')
 list = []
 for article in articles:
@@ -20,9 +36,26 @@ for atag in list:
 foot = '</body></html>'
 
 html = head + body + foot
-f = open("d:\\meituan.html", "w",encoding= 'utf8')
-f.write(html)
-f.close()
+
+file_path = 'd:\\meituan'
+mkdir('file_path')
+
+def write(html,file):
+    f = open(file, "w", encoding='utf8')
+    f.write(html)
+    f.close()
+
+write(html,file_path + '\meituan.html')
+
+def write_content(url):
+    page = request.urlopen(url)
+    html = page.read().decode("utf-8")
+    url = url.replace("https://tech.meituan.com/","")
+    write(html,file_path + '\\' + url);
 
 
+write_content('https://tech.meituan.com/fe_security_csrf.html')
+
+for atag in list:
+    write_content(str(atag['href']))
 

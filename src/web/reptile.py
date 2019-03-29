@@ -22,7 +22,7 @@ page = request.urlopen('https://tech.meituan.com/archives')
 
 htmlcode = page.read().decode("utf-8")
 soup = BeautifulSoup(htmlcode, 'lxml')
-articles = soup.findAll('article')
+articles = soup.select('.post-title')
 list = []
 for article in articles:
     atag = article.find_all('a')[0]
@@ -38,7 +38,7 @@ foot = '</body></html>'
 html = head + body + foot
 
 file_path = 'd:\\meituan'
-mkdir('file_path')
+mkdir(file_path)
 
 def write(html,file):
     f = open(file, "w", encoding='utf8')
@@ -50,11 +50,11 @@ write(html,file_path + '\meituan.html')
 def write_content(url):
     page = request.urlopen(url)
     html = page.read().decode("utf-8")
-    url = url.replace("https://tech.meituan.com/","")
+    url = url.replace("https://tech.meituan.com/","").replace("/","_")
     write(html,file_path + '\\' + url);
 
 
-write_content('https://tech.meituan.com/fe_security_csrf.html')
+# write_content('https://tech.meituan.com/fe_security_csrf.html')
 
 for atag in list:
     write_content(str(atag['href']))

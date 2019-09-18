@@ -63,7 +63,7 @@ def write_content(url):
     page = request.urlopen(url)
     html = page.read().decode("utf-8")
     url = url.replace("https://tech.meituan.com/", "").replace("/", "_")
-    write(html, file_path + '\\' + url);
+    write(html, file_path + '\\' + url)
 
 
 # write_content('https://tech.meituan.com/fe_security_csrf.html')

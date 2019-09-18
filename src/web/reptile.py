@@ -1,5 +1,8 @@
 # coding:utf-8
 from urllib import request
+import requests
+import json
+
 from bs4 import BeautifulSoup
 
 
@@ -40,22 +43,30 @@ html = head + body + foot
 file_path = 'd:\\meituan'
 mkdir(file_path)
 
-def write(html,file):
-    f = open(file, "w", encoding='utf8')
-    f.write(html)
-    f.close()
 
-write(html,file_path + '\meituan.html')
+def write(html, file):
+    headers = {'Accept-Charset': 'utf-8', 'Content-Type': 'application/json'}
+    params = {
+        "content": html
+    }
+    response = requests.post('http://127.0.0.1:9200/meituan/blog', headers=headers, data=json.dumps(params))
+    print(response.content)
+    # f = open(file, "w", encoding='utf8')
+    # f.write(html)
+    # f.close()
+
+
+write(html, file_path + '\meituan.html')
+
 
 def write_content(url):
     page = request.urlopen(url)
     html = page.read().decode("utf-8")
-    url = url.replace("https://tech.meituan.com/","").replace("/","_")
-    write(html,file_path + '\\' + url);
+    url = url.replace("https://tech.meituan.com/", "").replace("/", "_")
+    write(html, file_path + '\\' + url);
 
 
 # write_content('https://tech.meituan.com/fe_security_csrf.html')
 
 for atag in list:
     write_content(str(atag['href']))
-

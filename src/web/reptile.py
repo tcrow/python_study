@@ -38,19 +38,25 @@ for atag in list:
     body += str(atag) + '<br>'
 foot = '</body></html>'
 
-html = head + body + foot
+# html = head + body + foot
+html = body
 
 file_path = 'd:\\meituan'
 mkdir(file_path)
 
 
 def write(html, file):
-    headers = {'Accept-Charset': 'utf-8', 'Content-Type': 'application/json'}
-    params = {
-        "content": html
-    }
-    response = requests.post('http://127.0.0.1:9200/meituan/blog', headers=headers, data=json.dumps(params))
-    print(response.content)
+    if file != 'd:\\meituan\\meituan.html':
+        soup = BeautifulSoup(html, 'lxml')
+        article = soup.select_one('.post-title')
+        atag = article.find_all('a')[0]
+        headers = {'Accept-Charset': 'utf-8', 'Content-Type': 'application/json'}
+        params = {
+            "name": atag.text,
+            "content": html
+        }
+        response = requests.post('http://10.0.0.39:9200/meituan/blog', headers=headers, data=json.dumps(params))
+        print(response.content)
     # f = open(file, "w", encoding='utf8')
     # f.write(html)
     # f.close()

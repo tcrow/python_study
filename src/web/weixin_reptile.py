@@ -51,7 +51,7 @@ for script in scripts:
                 "name": 'shufang ' + title,
                 "content": content
             }
-            response = requests.post('http://10.0.0.39:9200/meituan/blog', headers=headers, data=json.dumps(params))
+            response = requests.post('http://127.0.0.1:9200/meituan/blog', headers=headers, data=json.dumps(params))
             print(response.content)
 
 

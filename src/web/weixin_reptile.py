@@ -1,11 +1,36 @@
 # # coding:utf-8
 import http.cookiejar
-import requests
-import re
-from urllib import request
 import json
+from urllib import request
 
-from bs4 import BeautifulSoup
+import requests
+
+
+def saveEs(item):
+    if 'app_msg_ext_info' not in item:
+        return
+    comm = item['comm_msg_info']
+    info = item['app_msg_ext_info']
+    title = info['title']
+    content_url = info['content_url']
+    content_url = content_url.replace('\/', '/')
+    if len(content_url.strip()) == 0:
+        return
+    try:
+        page = request.urlopen(content_url)
+    except:
+        print('出错了' + content_url)
+        return
+    content = page.read().decode("utf-8")
+    h = {'Accept-Charset': 'utf-8', 'Content-Type': 'application/json'}
+    params = {
+        "name": prefix + ' ' + title,
+        "content": content,
+        "datetime": comm['datetime']
+    }
+    resp = requests.post('http://10.0.0.39:9200/meituan/blog', headers=h, data=json.dumps(params))
+    print(resp.content)
+
 
 cookie = http.cookiejar.CookieJar()  # 声明一个CookieJar对象实例来保存cookie
 handler = request.HTTPCookieProcessor(cookie)  # 利用urllib2库的HTTPCookieProcessor对象来创建cookie处理器
@@ -21,45 +46,29 @@ headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36',
     'Cookie': '',
 }
-url = ''
-r = request.Request(url=url, headers=headers, method="GET")
-response = opener.open(r)
-
-htmlcode = response.read().decode()
-soup = BeautifulSoup(htmlcode, 'lxml')
-# soup = BeautifulSoup(htmlcode, "html.parser")
-
-pattern = re.compile(r"wx.cgiData.mass_data'(.*?)';$", re.MULTILINE | re.DOTALL)
-
-scripts = soup.find_all("script")
-
-for script in scripts:
-    if 'wx.cgiData.mass_data' in script.text:
-        text = script.text.replace(' ', '')
-        text = text[text.index('wx.cgiData.mass_data=')+21:]
-        text = text[:text.index('\n') - 1]
-        j = json.loads(text)
-        # print(text.index('wx.cgiData.mass_data='))
-        # print(text.index('wx.cgiData.mass_data='))
-        for send in j["sent_list"]:
-            title = send['appmsg_info'][0]['title']
-            content_url = send['appmsg_info'][0]['content_url']
-            page = request.urlopen(content_url)
-            content = page.read().decode("utf-8")
-            headers = {'Accept-Charset': 'utf-8', 'Content-Type': 'application/json'}
-            params = {
-                "name": 'shufang ' + title,
-                "content": content
-            }
-            response = requests.post('http://127.0.0.1:9200/meituan/blog', headers=headers, data=json.dumps(params))
-            print(response.content)
+url = 'https://mp.weixin.qq.com/mp/profile_ext?action=getmsgf=json'
+prefix = 'shufang'
 
 
-# print(htmlcode)
-# print(soup.text)
-# print(scripts)
+def reptile(url):
+    r = request.Request(url=url, headers=headers, method="GET")
+    response = opener.open(r)
+    offset = url[url.index('offset='):]
+    offset = int(offset[7:offset.index('&')])
+    htmlcode = response.read().decode()
+    # soup = BeautifulSoup(htmlcode, 'lxml')
+    j = json.loads(htmlcode)
+    if j['ret'] != 0:
+        print('返回数据错误，请检查链接')
+        exit(0)
+    next_offset = j['next_offset']
+    if offset == next_offset:
+        return
+    general_msg_list = j['general_msg_list']
+    general_msg_list = json.loads(general_msg_list)
+    for item in general_msg_list['list']:
+        saveEs(item)
+    reptile(url.replace("offset=" + str(offset), 'offset=' + str(next_offset)))
 
-# from selenium import webdriver
-#
-# driver = webdriver.Chrome()
-# driver.get("http://www.baidu.com")
+
+reptile(url)

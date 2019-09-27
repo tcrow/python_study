@@ -79,7 +79,7 @@ def reptile(url, prefix):
 
 
 # 使用抓包工具获取的链接地址
-url = 'https://mp.weixin.qq.com/mp/profile_ext?action=getmsgf=json'
+url = 'https://mp.weixin.qq.com/mp/profile_ext?action=getmsg&__biz=123==&f=json&offset=0&count=10&is_ok=1&scene=124&uin=123&pass_ticket=123&wxtoken=&appmsg_token=123&x5=0&f=json'
 # 为了方便搜索引擎搜索到公众号文章，可以给标题加个前缀，比如使用公众号名称
 prefix = 'shufang'
 
